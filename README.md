@@ -1,4 +1,5 @@
 Script to query ENTSO-E database using [entsoe-py](https://github.com/EnergieID/entsoe-py) for production data and compute corresponding emissions to plot this kind of graphic:
+![](./plots/20200101-20201231_DEFR_emission_vs_production.png)
 
 See all plots available here: [plots](./plots).
 
