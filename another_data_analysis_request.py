@@ -51,14 +51,21 @@ def query_entsoe(start, end, country_list):
         DESCRIPTION.
     """
     df = []
+    timespan = f"{start.strftime('%Y%m%d')}-{end.strftime('%Y%m%d')}"
+    if start.strftime('%Y') != end.strftime('%Y'):
+        print('error start year and end year must be equal')
+        return df,timespan
+    
     for country in country_list:
         # check if file already exists
-        files = os.listdir('c:/Users/obenr/energiewende/data')
-        timespan = f"{start.strftime('%Y%m%d')}-{end.strftime('%Y%m%d')}"
+        thisDir ='c:/Users/obenr/energiewende/data/' + start.strftime('%Y')
+        files = os.listdir(thisDir)
+        
         check_file = f"{timespan}_{country}_production.csv"
         if check_file in files:
             # file already exists, just read it
-            dfc = pd.read_csv(f'c:/Users/obenr/energiewende/data/{check_file}', index_col=0)
+            #dfc = pd.read_csv(f'c:/Users/obenr/energiewende/data/{check_file}', index_col=0)
+            dfc = pd.read_csv(f'{thisDir}/{check_file}', index_col=0)
         else:
             # request "Actual Generation per Production Type - Aggregated Generation per Type [16.1.B&C]" to API
             dfc = client.query_generation(country, start=start, end=end)
@@ -69,7 +76,8 @@ def query_entsoe(start, end, country_list):
                 dfc = dfc.filter(regex='Actual Aggregated', axis=1).droplevel(1,axis=1)
             # write csv file to /data
             #dfc.rename(columns= {dfc.columns[0]:'date'}, inplace=True)
-            dfc.to_csv(f"c:/Users/obenr/energiewende/data/{check_file}")
+            #dfc.to_csv(f"c:/Users/obenr/energiewende/data/{check_file}")
+            dfc.to_csv(f"{thisDir}/{check_file}")
         # reconstitute df for country_list
         df.append(dfc)
     return df, timespan
@@ -115,7 +123,7 @@ pwd_file = open( 'c:/data/txt/my ensoe token.txt','r')
 TOKEN_API = pwd_file.read()
 pwd_file.close()
 client = EntsoePandasClient(api_key=TOKEN_API) #'${{ secrets.TOKEN_API }}')
-year_start = 2015
+year_start = 2019
 year_end = 2022
 country_code = ['DE','FR','GB','IT','ES','NL','DK','NO','CH','PL','BE','PT','SE']
 color_codes = ['xkcd:greenish brown','xkcd:sky blue','xkcd:bright green','xkcd:true blue', 'xkcd:yellow','xkcd:tangerine','xkcd:light cyan',
